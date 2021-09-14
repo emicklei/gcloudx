@@ -95,6 +95,18 @@ func newApp() *cli.App {
 						return im.Roles(args)
 					},
 				},
+				{
+					Name:  "owners",
+					Usage: "list all members thata have Project Owner permission on a project",
+					Action: func(c *cli.Context) error {
+						defer logBegin(c)()
+						args := im.IAMArguments{
+							Verbose: c.Bool("v"),
+							Member:  c.Args().First(),
+						}
+						return im.Owners(args)
+					},
+				},
 			},
 		},
 		{

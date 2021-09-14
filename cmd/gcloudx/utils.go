@@ -21,7 +21,7 @@ func promptForYes(message string) bool {
 }
 
 func logBegin(c *cli.Context) func() {
-	if c.Bool("v") {
+	if !c.Bool("v") {
 		return func() {}
 	}
 	buf := new(bytes.Buffer)

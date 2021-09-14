@@ -36,6 +36,12 @@ Authenticated GCP user account with relevant permissions.
     USAGE:
     gcloudx iam roles [arguments...]
 
+### examples
+
+Find all owners
+
+    gcloudx iam owners
+
 
 ## bq
 
@@ -50,7 +56,9 @@ Authenticated GCP user account with relevant permissions.
     OPTIONS:
     -o value  output file with DOT notation (default: "bigquery.dot")
 
-### example
+### examples
+
+Open a graph diagram with all dependencies found frmo a given BigQuery view
 
     gcloudx bq deps -o g.dot myproject-id.my_dataset.my_view && cat g.dot | dot -Tpng > gcloudx-deps-bigquery.png && open gcloudx-deps-bigquery.png
 
