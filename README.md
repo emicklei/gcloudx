@@ -7,6 +7,10 @@ Authenticated GCP user account with relevant permissions.
 
     gcloud auth application-default login
 
+## install
+
+    go install github.com/emicklei/gcloudx/cmd/gcloudx@latest
+
 ## pubsub
 
     gcloudx pubsub publish -h
@@ -21,5 +25,15 @@ Authenticated GCP user account with relevant permissions.
     -p value  GCP project identifier
     -t value  PubSub topic identifier (short name)
     -f value  File containing the payload
+
+## iam
+
+    gcloudx iam roles -h   
+
+    NAME:
+    gcloudx iam roles - list all permissions assigned to a member
+
+    USAGE:
+    gcloudx iam roles [arguments...]
 
 &copy; 2021 ernestmicklei.com MIT License.    

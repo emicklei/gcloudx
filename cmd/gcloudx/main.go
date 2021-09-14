@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 
+	"github.com/emicklei/gcloudx/im"
 	"github.com/emicklei/gcloudx/ps"
 	"github.com/urfave/cli"
 )
@@ -75,6 +76,20 @@ func newApp() *cli.App {
 		{
 			Name:  "iam",
 			Usage: "Work with IAM",
+			Subcommands: []cli.Command{
+				{
+					Name:  "roles",
+					Usage: "list all permissions assigned to a member",
+					Action: func(c *cli.Context) error {
+						defer started(c, "roles")()
+						args := im.IAMArguments{
+							Verbose: c.GlobalBool("v"),
+							Member:  c.Args()[0],
+						}
+						return im.Roles(args)
+					},
+				},
+			},
 		},
 		{
 			Name:  "bq",
