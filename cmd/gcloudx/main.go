@@ -49,6 +49,10 @@ func newApp() *cli.App {
 		Name:  "t",
 		Usage: `PubSub topic identifier (short name)`,
 	}
+	subscriptionFlag := &cli.StringFlag{
+		Name:  "s",
+		Usage: `PubSub subscription identifier (short name)`,
+	}
 	fileFlag := &cli.StringFlag{
 		Name:  "f",
 		Usage: `File containing the payload`,
@@ -76,6 +80,33 @@ func newApp() *cli.App {
 						return ps.Publish(args)
 					},
 					Flags: []cli.Flag{projectFlag, topicFlag, fileFlag},
+				},
+				{
+					Name:  "create-topic",
+					Usage: "create a new topic",
+					Action: func(c *cli.Context) error {
+						defer logBegin(c)()
+						args := ps.PubSubArguments{
+							Project: c.String("p"),
+							Topic:   c.String("t"),
+						}
+						return ps.CreateTopic(args)
+					},
+					Flags: []cli.Flag{projectFlag, topicFlag},
+				},
+				{
+					Name:  "create-subscription",
+					Usage: "create a new subscription",
+					Action: func(c *cli.Context) error {
+						defer logBegin(c)()
+						args := ps.PubSubArguments{
+							Project:      c.String("p"),
+							Topic:        c.String("t"),
+							Subscription: c.String("s"),
+						}
+						return ps.CreateSubscription(args)
+					},
+					Flags: []cli.Flag{projectFlag, topicFlag, subscriptionFlag},
 				},
 			},
 		},

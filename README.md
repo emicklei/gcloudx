@@ -62,4 +62,9 @@ Open a graph diagram with all dependencies found frmo a given BigQuery view
 
     gcloudx bq deps -o g.dot myproject-id.my_dataset.my_view && cat g.dot | dot -Tpng > gcloudx-deps-bigquery.png && open gcloudx-deps-bigquery.png
 
-&copy; 2021 ernestmicklei.com MIT License.    
+### emulator
+
+The client libraries used in gcloudx are able to use the emulator version of the service.
+For example, see for [pub/sub](https://cloud.google.com/pubsub/docs/emulator).
+
+&copy; 2022 ernestmicklei.com MIT License.    

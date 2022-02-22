@@ -16,6 +16,7 @@ type PubSubArguments struct {
 	File         string
 	Topic        string
 	Subscription string
+	UseEmulator  bool
 }
 
 func Publish(args PubSubArguments) error {
