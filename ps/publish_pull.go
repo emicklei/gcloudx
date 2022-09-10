@@ -11,14 +11,6 @@ import (
 	"cloud.google.com/go/pubsub"
 )
 
-type PubSubArguments struct {
-	Project      string
-	File         string
-	Topic        string
-	Subscription string
-	UseEmulator  bool
-}
-
 func Publish(args PubSubArguments) error {
 	ctx := context.Background()
 	client, err := pubsub.NewClient(ctx, args.Project)
@@ -75,7 +67,7 @@ func Pull(args PubSubArguments) error {
 	}
 	if len(args.File) > 0 {
 		fmt.Println("writing to", args.File)
-		err = ioutil.WriteFile(args.File, data, os.ModePerm)
+		err = os.WriteFile(args.File, data, os.ModePerm)
 		if err != nil {
 			log.Printf("Write: %v", err)
 		}

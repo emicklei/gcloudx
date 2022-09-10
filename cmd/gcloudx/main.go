@@ -53,6 +53,10 @@ func newApp() *cli.App {
 		Name:  "s",
 		Usage: `PubSub subscription identifier (short name)`,
 	}
+	pushURLFlag := &cli.StringFlag{
+		Name:  "u",
+		Usage: `PubSub Push subscription URL`,
+	}
 	fileFlag := &cli.StringFlag{
 		Name:  "f",
 		Usage: `File containing the payload`,
@@ -80,6 +84,21 @@ func newApp() *cli.App {
 						return ps.Publish(args)
 					},
 					Flags: []cli.Flag{projectFlag, topicFlag, fileFlag},
+				},
+				{
+					Name:  "pullpush",
+					Usage: "pulls messages from a subscription and pushes them to a HTTP endpoint",
+					Action: func(c *cli.Context) error {
+						defer logBegin(c)()
+						args := ps.PubSubArguments{
+							Project: c.String("p"),
+							File:    c.String("f"),
+							Topic:   c.String("t"),
+							PushURL: c.String("u"),
+						}
+						return ps.PullPush(args)
+					},
+					Flags: []cli.Flag{projectFlag, topicFlag, pushURLFlag},
 				},
 				{
 					Name:  "create-topic",

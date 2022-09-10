@@ -11,7 +11,7 @@ Authenticated GCP user account with relevant permissions.
 
     go install github.com/emicklei/gcloudx/cmd/gcloudx@latest
 
-## pubsub
+## pubsub - publish
 
     gcloudx pubsub publish -h
 
@@ -25,6 +25,19 @@ Authenticated GCP user account with relevant permissions.
     -p value  GCP project identifier
     -t value  PubSub topic identifier (short name)
     -f value  File containing the payload
+
+## pubsub - pullpush
+
+    NAME:
+    gcloudx pubsub pullpush - pulls messages from a subscription and pushes them to a HTTP endpoint
+
+    USAGE:
+    gcloudx pubsub pullpush [command options] [arguments...]
+
+    OPTIONS:
+    -p value  GCP project identifier
+    -t value  PubSub topic identifier (short name)
+    -u value  PubSub Push subscription URL
 
 ## iam
 
