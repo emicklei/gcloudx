@@ -91,14 +91,13 @@ func newApp() *cli.App {
 					Action: func(c *cli.Context) error {
 						defer logBegin(c)()
 						args := ps.PubSubArguments{
-							Project: c.String("p"),
-							File:    c.String("f"),
-							Topic:   c.String("t"),
-							PushURL: c.String("u"),
+							Project:      c.String("p"),
+							Subscription: c.String("s"),
+							PushURL:      c.String("u"),
 						}
 						return ps.PullPush(args)
 					},
-					Flags: []cli.Flag{projectFlag, topicFlag, pushURLFlag},
+					Flags: []cli.Flag{projectFlag, subscriptionFlag, pushURLFlag},
 				},
 				{
 					Name:  "create-topic",
