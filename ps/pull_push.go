@@ -49,6 +49,9 @@ func PullPush(args PubSubArguments) error {
 			if resp.StatusCode == http.StatusOK {
 				log.Printf("pushed message: %s\n", msg.ID)
 				msg.Ack()
+			} else {
+				log.Printf("failed to push message (Nack-ed it): %s error: %v\n", msg.ID, resp.Status)
+				msg.Nack()
 			}
 		})
 		if err != nil {
