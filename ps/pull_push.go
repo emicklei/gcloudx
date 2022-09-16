@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 
@@ -50,8 +51,13 @@ func PullPush(args PubSubArguments) error {
 				log.Printf("pushed message: %s\n", msg.ID)
 				msg.Ack()
 			} else {
-				log.Printf("failed to push message (Nack-ed it): %s error: %v\n", msg.ID, resp.Status)
-				msg.Nack()
+				body, _ := io.ReadAll(resp.Body)
+				log.Printf("failed to push message: %s error: %v body:%s\n", msg.ID, resp.Status, string(body))
+				if args.AlwaysACK {
+					log.Printf("despite the error, the message is acknowledged and lost forever, id:%s", msg.ID)
+				} else {
+					msg.Nack()
+				}
 			}
 		})
 		if err != nil {

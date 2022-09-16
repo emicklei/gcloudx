@@ -66,6 +66,11 @@ func newApp() *cli.App {
 		Usage: `output file with DOT notation`,
 		Value: "bigquery.dot",
 	}
+	alwaysAckFlag := &cli.BoolFlag{
+		Name:  "ack",
+		Usage: "if true then even or error,always ackowledge messages",
+		Value: false,
+	}
 	app.Commands = []*cli.Command{
 		{
 			Name:  "pubsub",
@@ -94,10 +99,11 @@ func newApp() *cli.App {
 							Project:      c.String("p"),
 							Subscription: c.String("s"),
 							PushURL:      c.String("u"),
+							AlwaysACK:    c.Bool("ack"),
 						}
 						return ps.PullPush(args)
 					},
-					Flags: []cli.Flag{projectFlag, subscriptionFlag, pushURLFlag},
+					Flags: []cli.Flag{projectFlag, subscriptionFlag, pushURLFlag, alwaysAckFlag},
 				},
 				{
 					Name:  "create-topic",

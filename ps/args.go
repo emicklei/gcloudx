@@ -7,4 +7,5 @@ type PubSubArguments struct {
 	Subscription string
 	UseEmulator  bool
 	PushURL      string
+	AlwaysACK    bool
 }
