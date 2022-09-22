@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go/bigquery v1.40.0
 	cloud.google.com/go/pubsub v1.25.1
 	github.com/emicklei/dot v1.0.0
+	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/urfave/cli/v2 v2.15.0
 	google.golang.org/api v0.95.0
 )
@@ -21,6 +22,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.1.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.5.1 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.opencensus.io v0.23.0 // indirect

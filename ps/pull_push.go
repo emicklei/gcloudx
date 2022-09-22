@@ -23,7 +23,7 @@ func PullPush(args PubSubArguments) error {
 	sub := pullClient.Subscription(args.Subscription)
 	pushClient := new(http.Client)
 	for {
-		log.Println("receiving from", args.Subscription)
+		log.Println("waiting for messages from", args.Subscription, "...")
 		err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 			log.Printf("received message: %s\n", msg.ID)
 			msgOut := PubSubMessage{}
@@ -37,7 +37,7 @@ func PullPush(args PubSubArguments) error {
 				log.Printf("payload marshal failed: %v", err)
 				return
 			}
-			req, err := http.NewRequest(http.MethodPost, args.PushURL, bytes.NewReader(dataOut))
+			req, err := http.NewRequestWithContext(ctx, http.MethodPost, args.PushURL, bytes.NewReader(dataOut))
 			if err != nil {
 				log.Printf("create request failed: %v", err)
 				return
@@ -54,14 +54,15 @@ func PullPush(args PubSubArguments) error {
 				body, _ := io.ReadAll(resp.Body)
 				log.Printf("failed to push message: %s error: %v body:%s\n", msg.ID, resp.Status, string(body))
 				if args.AlwaysACK {
-					log.Printf("despite the error, the message is acknowledged and lost forever, id:%s", msg.ID)
+					log.Printf("despite the error, the message is acknowledged, id:%s", msg.ID)
+					msg.Ack()
 				} else {
 					msg.Nack()
 				}
 			}
 		})
 		if err != nil {
-			return err
+			log.Println("err:", err)
 		}
 	}
 }

@@ -86,6 +86,7 @@ func newApp() *cli.App {
 							File:    c.String("f"),
 							Topic:   c.String("t"),
 						}
+						log.SetPrefix("[gcloudx publish] ")
 						return ps.Publish(args)
 					},
 					Flags: []cli.Flag{projectFlag, topicFlag, fileFlag},
@@ -101,6 +102,7 @@ func newApp() *cli.App {
 							PushURL:      c.String("u"),
 							AlwaysACK:    c.Bool("ack"),
 						}
+						log.SetPrefix("[gcloudx pullpush] ")
 						return ps.PullPush(args)
 					},
 					Flags: []cli.Flag{projectFlag, subscriptionFlag, pushURLFlag, alwaysAckFlag},
@@ -172,6 +174,7 @@ func newApp() *cli.App {
 					Name:  "deps",
 					Usage: "bq deps PROJECT(.|:)DATASET.VIEW,...",
 					Action: func(c *cli.Context) error {
+						log.SetPrefix("[gcloudx bq deps] ")
 						defer logBegin(c)()
 						args := bq.BigQueryArguments{
 							Verbose: c.Bool("v"),
