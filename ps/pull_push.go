@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"cloud.google.com/go/pubsub"
 )
@@ -21,49 +22,48 @@ func PullPush(args PubSubArguments) error {
 	}
 	defer pullClient.Close()
 	sub := pullClient.Subscription(args.Subscription)
+	sub.ReceiveSettings = pubsub.ReceiveSettings{
+		MaxExtensionPeriod: 10 * time.Second,
+	}
 	pushClient := new(http.Client)
-	for {
-		log.Println("waiting for messages from", args.Subscription, "...")
-		err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-			log.Printf("received message: %s\n", msg.ID)
-			msgOut := PubSubMessage{}
-			msgOut.Message.Data = msg.Data
-			msgOut.Message.ID = msg.ID
-			msgOut.Subscription = args.Subscription
-			msgOut.MessageId = msg.ID
-			msgOut.Message.Attributes = msg.Attributes
-			dataOut, err := json.Marshal(msgOut)
-			if err != nil {
-				log.Printf("payload marshal failed: %v", err)
-				return
-			}
-			req, err := http.NewRequestWithContext(ctx, http.MethodPost, args.PushURL, bytes.NewReader(dataOut))
-			if err != nil {
-				log.Printf("create request failed: %v", err)
-				return
-			}
-			resp, err := pushClient.Do(req)
-			if err != nil {
-				log.Printf("send request failed: %v", err)
-				return
-			}
-			if resp.StatusCode == http.StatusOK {
-				log.Printf("pushed message: %s\n", msg.ID)
-				msg.Ack()
-			} else {
-				body, _ := io.ReadAll(resp.Body)
-				log.Printf("failed to push message: %s error: %v body:%s\n", msg.ID, resp.Status, string(body))
-				if args.AlwaysACK {
-					log.Printf("despite the error, the message is acknowledged, id:%s", msg.ID)
-					msg.Ack()
-				} else {
-					msg.Nack()
-				}
-			}
-		})
+
+	log.Println("waiting for messages from", args.Subscription, "...")
+	if err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+		log.Printf("received message: %s\n", msg.ID)
+		msgOut := PubSubMessage{}
+		msgOut.Message.Data = msg.Data
+		msgOut.Message.ID = msg.ID
+		msgOut.Subscription = args.Subscription
+		msgOut.MessageId = msg.ID
+		msgOut.Message.Attributes = msg.Attributes
+		dataOut, err := json.Marshal(msgOut)
 		if err != nil {
-			log.Println("err:", err)
+			log.Printf("payload marshal failed: %v", err)
+			return
 		}
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, args.PushURL, bytes.NewReader(dataOut))
+		if err != nil {
+			log.Printf("create request failed: %v", err)
+			return
+		}
+		resp, err := pushClient.Do(req)
+		if err != nil {
+			log.Printf("send request failed: %v", err)
+			return
+		}
+		if resp.StatusCode == http.StatusOK {
+			log.Printf("pushed message: %s\n", msg.ID)
+			msg.Ack()
+		} else {
+			body, _ := io.ReadAll(resp.Body)
+			log.Printf("failed to push message: %s error: %v body:%s\n", msg.ID, resp.Status, string(body))
+			if args.AlwaysACK {
+				log.Printf("despite the error, the message is acknowledged, id:%s", msg.ID)
+				msg.Ack()
+			}
+		}
+	}); err != nil {
+		log.Println("Receive err:", err)
 	}
 }
 
