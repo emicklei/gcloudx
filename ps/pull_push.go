@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
+	"github.com/google/cel-go/cel"
 )
 
 // Pull messages from a Subscription and Push them to an endpoint.
@@ -26,6 +27,13 @@ func PullPush(args PubSubArguments) error {
 		MaxExtensionPeriod: 10 * time.Second,
 	}
 	pushClient := new(http.Client)
+
+	if args.SubscriptionFilter != "" {
+		env, _ := cel.NewEnv(
+			cel.Variable("attributes", cel.MapType(cel.StringType, cel.StringType)),
+		)
+		log.Println(env)
+	}
 
 	log.Println("waiting for messages from", args.Subscription, "...")
 	if err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
