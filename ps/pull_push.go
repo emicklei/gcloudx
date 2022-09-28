@@ -29,7 +29,7 @@ func PullPush(args PubSubArguments) error {
 
 	log.Println("waiting for messages from", args.Subscription, "...")
 	if err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		log.Printf("received message: %s\n", msg.ID)
+		log.Printf("received message: %s subscription: %s \n", msg.ID, args.Subscription)
 		msgOut := PubSubMessage{}
 		msgOut.Message.Data = msg.Data
 		msgOut.Message.ID = msg.ID
@@ -48,11 +48,11 @@ func PullPush(args PubSubArguments) error {
 		}
 		resp, err := pushClient.Do(req)
 		if err != nil {
-			log.Printf("send request failed: %v", err)
+			log.Printf("send POST request failed: %v", err)
 			return
 		}
 		if resp.StatusCode == http.StatusOK {
-			log.Printf("pushed message: %s\n", msg.ID)
+			log.Printf("pushed message: %s attributes: %v\n", msg.ID, msg.Attributes)
 			msg.Ack()
 		} else {
 			body, _ := io.ReadAll(resp.Body)
@@ -65,6 +65,7 @@ func PullPush(args PubSubArguments) error {
 	}); err != nil {
 		log.Println("Receive err:", err)
 	}
+	return err
 }
 
 // PubSubMessage is the payload of a Pub/Sub event.
