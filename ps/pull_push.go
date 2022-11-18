@@ -35,7 +35,7 @@ func PullPush(args PubSubArguments) error {
 		log.Println(env)
 	}
 
-	log.Println("waiting for messages from", args.Subscription, "...")
+	log.Println("waiting for messages from subscription:", args.Subscription, "...")
 	if err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		log.Printf("received message: %s subscription: %s \n", msg.ID, args.Subscription)
 		msgOut := PubSubMessage{}
@@ -65,6 +65,9 @@ func PullPush(args PubSubArguments) error {
 		} else {
 			body, _ := io.ReadAll(resp.Body)
 			log.Printf("failed to push message: %s error: %v body:%s\n", msg.ID, resp.Status, string(body))
+			if args.AbortOnError {
+				log.Fatal(err)
+			}
 			if args.AlwaysACK {
 				log.Printf("despite the error, the message is acknowledged, id:%s", msg.ID)
 				msg.Ack()

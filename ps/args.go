@@ -8,5 +8,6 @@ type PubSubArguments struct {
 	UseEmulator        bool
 	PushURL            string
 	AlwaysACK          bool
+	AbortOnError       bool
 	SubscriptionFilter string
 }

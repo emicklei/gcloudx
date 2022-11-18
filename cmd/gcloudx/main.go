@@ -71,6 +71,11 @@ func newApp() *cli.App {
 		Usage: "if true then even or error,always ackowledge messages",
 		Value: false,
 	}
+	abortOnErrorFlag := &cli.BoolFlag{
+		Name:  "abort",
+		Usage: "if true then abort on the first error detected",
+		Value: false,
+	}
 	app.Commands = []*cli.Command{
 		{
 			Name:  "pubsub",
@@ -101,11 +106,12 @@ func newApp() *cli.App {
 							Subscription: c.String("s"),
 							PushURL:      c.String("u"),
 							AlwaysACK:    c.Bool("ack"),
+							AbortOnError: c.Bool("abort"),
 						}
 						log.SetPrefix("[gcloudx pullpush] ")
 						return ps.PullPush(args)
 					},
-					Flags: []cli.Flag{projectFlag, subscriptionFlag, pushURLFlag, alwaysAckFlag},
+					Flags: []cli.Flag{projectFlag, subscriptionFlag, pushURLFlag, alwaysAckFlag, abortOnErrorFlag},
 				},
 				{
 					Name:  "create-topic",
