@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"reflect"
 	"time"
 
 	"cloud.google.com/go/pubsub"
@@ -28,16 +29,39 @@ func PullPush(args PubSubArguments) error {
 	}
 	pushClient := new(http.Client)
 
+	var filterProgram cel.Program
 	if args.SubscriptionFilter != "" {
 		env, _ := cel.NewEnv(
 			cel.Variable("attributes", cel.MapType(cel.StringType, cel.StringType)),
 		)
-		log.Println(env)
+		ast, issues := env.Compile(args.SubscriptionFilter)
+		if issues != nil && issues.Err() != nil {
+			log.Fatalf("type-check error: %s", issues.Err())
+		}
+		prg, err := env.Program(ast)
+		if err != nil {
+			log.Fatalf("program construction error: %s", err)
+		}
+		filterProgram = prg
 	}
 
 	log.Println("waiting for messages from subscription:", args.Subscription, "...")
 	if err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		log.Printf("received message: %s subscription: %s \n", msg.ID, args.Subscription)
+
+		// check filter if set
+		if filterProgram != nil {
+			val, _, err := filterProgram.ContextEval(ctx, map[string]any{"attributes": msg.Attributes})
+			if err != nil {
+				log.Println("[skip] filter eval error:", err)
+				return
+			}
+			if b, err := val.ConvertToNative(reflect.TypeOf(true)); err == nil && b.(bool) == false {
+				log.Println("[skip] failed to pass subscription filter")
+				return
+			}
+		}
+
 		msgOut := PubSubMessage{}
 		msgOut.Message.Data = msg.Data
 		msgOut.Message.ID = msg.ID

@@ -61,6 +61,10 @@ func newApp() *cli.App {
 		Name:  "f",
 		Usage: `File containing the payload`,
 	}
+	filterFlag := &cli.StringFlag{
+		Name:  "f",
+		Usage: `Filter expression`,
+	}
 	bqDotOutputFlag := &cli.StringFlag{
 		Name:  "o",
 		Usage: `output file with DOT notation`,
@@ -102,16 +106,17 @@ func newApp() *cli.App {
 					Action: func(c *cli.Context) error {
 						defer logBegin(c)()
 						args := ps.PubSubArguments{
-							Project:      c.String("p"),
-							Subscription: c.String("s"),
-							PushURL:      c.String("u"),
-							AlwaysACK:    c.Bool("ack"),
-							AbortOnError: c.Bool("abort"),
+							Project:            c.String("p"),
+							Subscription:       c.String("s"),
+							PushURL:            c.String("u"),
+							AlwaysACK:          c.Bool("ack"),
+							AbortOnError:       c.Bool("abort"),
+							SubscriptionFilter: c.String("f"),
 						}
 						log.SetPrefix("[gcloudx pullpush] ")
 						return ps.PullPush(args)
 					},
-					Flags: []cli.Flag{projectFlag, subscriptionFlag, pushURLFlag, alwaysAckFlag, abortOnErrorFlag},
+					Flags: []cli.Flag{projectFlag, subscriptionFlag, pushURLFlag, alwaysAckFlag, abortOnErrorFlag, filterFlag},
 				},
 				{
 					Name:  "create-topic",
