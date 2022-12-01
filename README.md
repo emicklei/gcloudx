@@ -37,7 +37,12 @@ Authenticated GCP user account with relevant permissions.
     OPTIONS:
     -p value  GCP project identifier
     -t value  PubSub topic identifier (short name)
+    -f value  subscription filter using a CEL expression
     -u value  PubSub Push subscription URL
+
+Example filter expression
+
+    -f "attributes[\"x-ag5-cloudevent-data-category\"] == \"entity_change\" "
 
 ## iam
 
