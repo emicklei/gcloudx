@@ -80,6 +80,21 @@ Open a graph diagram with all dependencies found frmo a given BigQuery view
 
     gcloudx bq deps -o g.dot myproject-id.my_dataset.my_view && cat g.dot | dot -Tpng > gcloudx-deps-bigquery.png && open gcloudx-deps-bigquery.png
 
+## spanner
+
+    gcloudx spanner dml -h
+
+    NAME:
+        gcloudx spanner dml - execute a long runnning DML query
+
+    USAGE:
+        gcloudx spanner dml [command options] [arguments...]
+
+    OPTIONS:
+        -d value    Spanner|BQ full database identifier
+        -f value    File containing the payload
+        --help, -h  show help
+
 ### emulator
 
 The client libraries used in gcloudx are able to use the emulator version of the service.

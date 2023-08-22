@@ -17,3 +17,5 @@ cmd/gcloudx/latest-gcp-bindings.json
 gdep-bigquery.png
 g.dot
 bigquery.dot
+sp/ag5.sh
+sp/mutation.sql

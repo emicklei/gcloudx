@@ -8,6 +8,7 @@ import (
 	"github.com/emicklei/gcloudx/bq"
 	"github.com/emicklei/gcloudx/im"
 	"github.com/emicklei/gcloudx/ps"
+	"github.com/emicklei/gcloudx/sp"
 	"github.com/urfave/cli/v2"
 )
 
@@ -45,6 +46,10 @@ func newApp() *cli.App {
 		Name:  "p",
 		Usage: `GCP project identifier`,
 	}
+	databaseFlag := &cli.StringFlag{
+		Name:  "d",
+		Usage: `Spanner|BQ full database identifier`,
+	}
 	topicFlag := &cli.StringFlag{
 		Name:  "t",
 		Usage: `PubSub topic identifier (short name)`,
@@ -59,7 +64,7 @@ func newApp() *cli.App {
 	}
 	fileFlag := &cli.StringFlag{
 		Name:  "f",
-		Usage: `File containing the payload`,
+		Usage: `File containing the payload or script`,
 	}
 	filterFlag := &cli.StringFlag{
 		Name:  "f",
@@ -82,6 +87,26 @@ func newApp() *cli.App {
 	}
 	app.Commands = []*cli.Command{
 		{
+			Name:  "spanner",
+			Usage: "Work with Spanner",
+			Subcommands: []*cli.Command{
+				{
+					Name:  "dml",
+					Usage: "execute a long runnning DML query",
+					Action: func(c *cli.Context) error {
+						defer logBegin(c)()
+						args := sp.SpannerArguments{
+							Database: c.String("d"),
+							File:     c.String("f"),
+						}
+						log.SetPrefix("[gcloudx spanner dml] ")
+						return sp.LongRunningMutation(args)
+					},
+					Flags: []cli.Flag{databaseFlag, fileFlag},
+				},
+			},
+		},
+		{
 			Name:  "pubsub",
 			Usage: "Work with Pub/Sub",
 			Subcommands: []*cli.Command{
@@ -95,7 +120,7 @@ func newApp() *cli.App {
 							File:    c.String("f"),
 							Topic:   c.String("t"),
 						}
-						log.SetPrefix("[gcloudx publish] ")
+						log.SetPrefix("[gcloudx pubsub publish] ")
 						return ps.Publish(args)
 					},
 					Flags: []cli.Flag{projectFlag, topicFlag, fileFlag},
