@@ -5,9 +5,9 @@ go 1.21
 require (
 	cloud.google.com/go/bigquery v1.54.0
 	cloud.google.com/go/pubsub v1.33.0
-	cloud.google.com/go/spanner v1.48.0
+	cloud.google.com/go/spanner v1.49.0
 	github.com/emicklei/dot v1.6.0
-	github.com/google/cel-go v0.17.2
+	github.com/google/cel-go v0.17.6
 	github.com/urfave/cli/v2 v2.25.7
 	google.golang.org/api v0.138.0
 )
