@@ -25,6 +25,7 @@ func LongRunningMutation(args SpannerArguments) error {
 		SQL: string(query),
 	}
 	var affectedRows int64 = -1
+	var totalRows int64 = 0
 	// for monitoring
 	loopCount := 0
 	// as long as there are rows affected...
@@ -57,7 +58,9 @@ func LongRunningMutation(args SpannerArguments) error {
 			log.Printf("loop count:%d affected rows:%v\n", loopCount, txRows)
 			// update the loop condition var
 			affectedRows = txRows
+			totalRows += txRows
 		}
 	}
+	log.Printf("total rows affected:%v\n", totalRows)
 	return nil
 }
