@@ -96,6 +96,7 @@ func newApp() *cli.App {
 					Action: func(c *cli.Context) error {
 						defer logBegin(c)()
 						args := sp.SpannerArguments{
+							Verbose:  c.Bool("v"),
 							Database: c.String("d"),
 							File:     c.String("f"),
 						}
