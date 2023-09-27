@@ -26,7 +26,7 @@ func LongRunningMutation(args SpannerArguments) error {
 		SQL: string(query),
 	}
 	if args.Verbose {
-		log.Println(string(query))
+		log.Println("SQL statement:", string(query))
 	}
 	var affectedRows int64 = -1
 	var totalRows int64 = 0
@@ -41,13 +41,13 @@ func LongRunningMutation(args SpannerArguments) error {
 		var txRows int64
 
 		if args.Verbose {
-			log.Println("timeout:", args.Timeout)
+			log.Println("transaction timeout is set to", args.Timeout)
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), args.Timeout)
 		defer cancel()
 
 		if args.PartitionedUpdate {
-			log.Println("using PartitionedUpdate")
+			log.Println("using partitioned update DML")
 			count, err := client.PartitionedUpdate(ctx, stmt)
 			if err != nil {
 				return err
