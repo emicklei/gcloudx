@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"time"
 
 	"github.com/emicklei/gcloudx/bq"
 	"github.com/emicklei/gcloudx/im"
@@ -85,6 +86,17 @@ func newApp() *cli.App {
 		Usage: "if true then abort on the first error detected",
 		Value: false,
 	}
+	partitionedUpdate := &cli.BoolFlag{
+		Name:  "partitioned_update",
+		Usage: "use Partitioned Update DML",
+		Value: false,
+	}
+	sec30, _ := time.ParseDuration("30s")
+	timeout := &cli.DurationFlag{
+		Name:  "timeout",
+		Usage: "timeout duration, e.g. 5m",
+		Value: sec30,
+	}
 	app.Commands = []*cli.Command{
 		{
 			Name:  "spanner",
@@ -96,14 +108,16 @@ func newApp() *cli.App {
 					Action: func(c *cli.Context) error {
 						defer logBegin(c)()
 						args := sp.SpannerArguments{
-							Verbose:  c.Bool("v"),
-							Database: c.String("d"),
-							File:     c.String("f"),
+							Verbose:           c.Bool("v"),
+							Database:          c.String("d"),
+							File:              c.String("f"),
+							PartitionedUpdate: c.Bool("partitioned_update"),
+							Timeout:           c.Duration("timeout"),
 						}
 						log.SetPrefix("[gcloudx spanner dml] ")
 						return sp.LongRunningMutation(args)
 					},
-					Flags: []cli.Flag{databaseFlag, fileFlag},
+					Flags: []cli.Flag{databaseFlag, fileFlag, partitionedUpdate, timeout},
 				},
 			},
 		},

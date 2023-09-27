@@ -39,24 +39,41 @@ func LongRunningMutation(args SpannerArguments) error {
 		// the function in the transaction could be called multiple times
 		// so we need to collect the total count first
 		var txRows int64
-		_, err = client.ReadWriteTransaction(ctx, func(ctx context.Context, rwt *spanner.ReadWriteTransaction) error {
-			iter := rwt.QueryWithStats(ctx, stmt)
-			// although we do not read the rows we need to drain the iterator properly
-			defer iter.Stop()
-			// drain the iterator
-			for {
-				_, err := iter.Next()
-				atomic.AddInt64(&txRows, iter.RowCount)
-				if err == iterator.Done {
-					break
-				}
-				// if the query fails then abort
-				if err != nil {
-					return err
-				}
+
+		if args.Verbose {
+			log.Println("timeout:", args.Timeout)
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), args.Timeout)
+		defer cancel()
+
+		if args.PartitionedUpdate {
+			log.Println("using PartitionedUpdate")
+			count, err := client.PartitionedUpdate(ctx, stmt)
+			if err != nil {
+				return err
 			}
-			return nil
-		})
+			atomic.AddInt64(&txRows, count)
+		} else {
+			_, err = client.ReadWriteTransaction(ctx, func(ctx context.Context, rwt *spanner.ReadWriteTransaction) error {
+				iter := rwt.QueryWithStats(ctx, stmt)
+				// although we do not read the rows we need to drain the iterator properly
+				defer iter.Stop()
+				// drain the iterator
+				for {
+					_, err := iter.Next()
+					atomic.AddInt64(&txRows, iter.RowCount)
+					if err == iterator.Done {
+						break
+					}
+					// if the query fails then abort
+					if err != nil {
+						return err
+					}
+				}
+				return nil
+			})
+		}
+
 		// if the query fails then abort
 		if err != nil && err != iterator.Done {
 			return err
