@@ -27,6 +27,7 @@ func LongRunningMutation(args SpannerArguments) error {
 	}
 	if args.Verbose {
 		log.Println("SQL statement:", string(query))
+		log.Println("transaction timeout per loopis set to", args.Timeout)
 	}
 	var affectedRows int64 = -1
 	var totalRows int64 = 0
@@ -40,9 +41,6 @@ func LongRunningMutation(args SpannerArguments) error {
 		// so we need to collect the total count first
 		var txRows int64
 
-		if args.Verbose {
-			log.Println("transaction timeout is set to", args.Timeout)
-		}
 		ctx, cancel := context.WithTimeout(context.Background(), args.Timeout)
 		defer cancel()
 
