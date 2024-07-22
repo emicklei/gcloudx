@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/emicklei/gcloudx/ai"
 	"github.com/emicklei/gcloudx/bq"
 	"github.com/emicklei/gcloudx/im"
 	"github.com/emicklei/gcloudx/ps"
@@ -59,9 +60,9 @@ func newApp() *cli.App {
 		Name:  "s",
 		Usage: `PubSub subscription identifier (short name)`,
 	}
-	pushURLFlag := &cli.StringFlag{
+	theURLFlag := &cli.StringFlag{
 		Name:  "u",
-		Usage: `PubSub Push subscription URL`,
+		Usage: `URL, e.g. PubSub Push subscription`,
 	}
 	fileFlag := &cli.StringFlag{
 		Name:  "f",
@@ -98,6 +99,43 @@ func newApp() *cli.App {
 		Value: sec30,
 	}
 	app.Commands = []*cli.Command{
+		{
+			Name:  "ai",
+			Usage: "Work with AI",
+			Subcommands: []*cli.Command{
+				{
+					Name:  "datastore",
+					Usage: "create a website search data store",
+					Action: func(c *cli.Context) error {
+						defer logBegin(c)()
+						args := ai.DataStoreArguments{
+							Location:      "global",
+							ProjectID:     c.String("p"),
+							DatastoreName: c.String("d"),
+						}
+						log.SetPrefix("[gcloudx ai datastore] ")
+						return ai.CreateDatastore(args)
+					},
+					Flags: []cli.Flag{projectFlag, databaseFlag},
+				},
+				{
+					Name:  "datastore-targetsite",
+					Usage: "add a target site to a website search data store",
+					Action: func(c *cli.Context) error {
+						defer logBegin(c)()
+						args := ai.DataStoreArguments{
+							Location:      "global",
+							ProjectID:     c.String("p"),
+							URLPattern:    c.String("u"),
+							DatastoreName: c.String("d"),
+						}
+						log.SetPrefix("[gcloudx ai datastore] ")
+						return ai.CreateTargetSite(args)
+					},
+					Flags: []cli.Flag{projectFlag, theURLFlag, databaseFlag},
+				},
+			},
+		},
 		{
 			Name:  "spanner",
 			Usage: "Work with Spanner",
@@ -156,7 +194,7 @@ func newApp() *cli.App {
 						log.SetPrefix("[gcloudx pullpush] ")
 						return ps.PullPush(args)
 					},
-					Flags: []cli.Flag{projectFlag, subscriptionFlag, pushURLFlag, alwaysAckFlag, abortOnErrorFlag, filterFlag},
+					Flags: []cli.Flag{projectFlag, subscriptionFlag, theURLFlag, alwaysAckFlag, abortOnErrorFlag, filterFlag},
 				},
 				{
 					Name:  "create-topic",

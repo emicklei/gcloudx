@@ -3,7 +3,6 @@ package bq
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -28,7 +27,7 @@ func ExportViewDepencyGraph(args BigQueryArguments) error {
 			return err
 		}
 	}
-	return ioutil.WriteFile(args.Output, []byte(g.String()), os.ModePerm)
+	return os.WriteFile(args.Output, []byte(g.String()), os.ModePerm)
 }
 
 func addDependencies(project string, dataset string, table string, root *dot.Graph, visited map[string]bool) error {
