@@ -21,3 +21,4 @@ sp/ag5.sh
 sp/mutation.sql
 sp/Makefile
 simone.code-workspace
+ai/*.sh
